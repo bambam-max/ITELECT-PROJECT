@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ToDo List</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+
+    <style>
+        body {
+            background: url(3.jpg)no-repeat center center/cover;
+        }
+        
+        .todo-card {
+            width: 100%;
+            max-width: 400px;
+            background-color: rgba(181, 176, 219, 0.508);
+        }
+        
+        .todo-input {
+            border-radius: 25px 0 0 25px;
+            padding-left: 20px;
+            background-color: rgba(240, 248, 255, 0.501);
+        }
+        
+        .todo-add-btn {
+            border-radius: 0 25px 25px 0;
+        }
+        
+        .todo-item.done span {
+            text-decoration: line-through;
+            color: rgba(128, 128, 128, 0.531);
+        }
+    </style>
+</head>
+
+<body class="bg-info d-flex justify-content-center align-items-center vh-100">
+    <div class="card p-4 todo-card">
+        <h4 class="text-center">ToDo List <span class="ms-2">📝✏️</span></h4>
+        <div class="input-group my-3">
+            <input type="text" id="taskInput" class="form-control todo-input" placeholder="Add your task">
+            <button class="btn btn-success todo-add-btn" onclick="addTask()">+</button>
+        </div>
+        <div id="message" class="text-success text-center small mb-2"></div>
+        <ul id="taskList" class="list-group"></ul>
+    </div>
+    <script>
+        let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+
+        function saveTasks() {
+            localStorage.setItem('tasks', JSON.stringify(tasks));
+        }
+
+        function renderTasks() {
+            const list = document.getElementById('taskList');
+            list.innerHTML = '';
+            tasks.forEach((task, index) => {
+                const li = document.createElement('li');
+                li.className = `list-group-item d-flex justify-content-between align-items-center todo-item ${task.done ? 'done' : ''}`;
+
+                const span = document.createElement('span');
+                span.textContent = task.text;
+
+                const div = document.createElement('div');
+
+                const doneBtn = document.createElement('button');
+                doneBtn.className = 'btn btn-sm btn-outline-success me-1';
+                doneBtn.innerHTML = task.done ? '<i class="bi bi-arrow-counterclockwise"></i>' : '<i class="bi bi-check2"></i>';
+                doneBtn.onclick = () => toggleDone(index);
+                div.appendChild(doneBtn);
+
+                if (!task.done) {
+                    const editBtn = document.createElement('button');
+                    editBtn.className = 'btn btn-sm btn-outline-secondary me-1';
+                    editBtn.innerHTML = '<i class="bi bi-pencil"></i>';
+                    editBtn.onclick = () => editTask(index);
+                    div.appendChild(editBtn);
+                }
+
+                const delBtn = document.createElement('button');
+                delBtn.className = 'btn btn-sm btn-outline-danger';
+                delBtn.innerHTML = '<i class="bi bi-trash"></i>';
+                delBtn.onclick = () => deleteTask(index);
+                div.appendChild(delBtn);
+
+                li.appendChild(span);
+                li.appendChild(div);
+                list.appendChild(li);
+            });
+        }
+
+        function addTask() {
+            const input = document.getElementById('taskInput');
+            const taskText = input.value.trim();
+            if (taskText === '') return;
+            tasks.push({
+                text: taskText,
+                done: false,
+                createdAt: new Date().toISOString(),
+                completedAt: null
+            });
+            saveTasks();
+            input.value = '';
+            document.getElementById('message').innerText = 'Todo item Created Successfully.';
+            renderTasks();
+            setTimeout(() => document.getElementById('message').innerText = '', 3000);
+        }
+
+        function deleteTask(index) {
+            tasks.splice(index, 1);
+            saveTasks();
+            renderTasks();
+        }
+
+        function editTask(index) {
+            const newText = prompt("Edit your task", tasks[index].text);
+            if (newText !== null && newText.trim() !== '') {
+                tasks[index].text = newText.trim();
+                saveTasks();
+                renderTasks();
+            }
+        }
+
+        function toggleDone(index) {
+            tasks[index].done = !tasks[index].done;
+            tasks[index].completedAt = tasks[index].done ? new Date().toISOString() : null;
+            saveTasks();
+            renderTasks();
+        }
+
+        renderTasks();
+    </script>
+</body>
+
+</html>

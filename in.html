@@ -18,7 +18,7 @@
     }
     .login-container {
       background: rgba(255, 255, 255, 0.151);
-      backdrop-filter: blur(10px);
+      
       padding: 40px 30px;
       border-radius: 15px;
       width: 350px;
@@ -68,13 +68,13 @@
     <h2 class="mb-4">Welcome</h2>
     <form id="loginForm">
       <div class="mb-3">
-        <input type="email" class="form-control bg-transparent text-white rounded-pill" id="email" placeholder="Email" required>
+        <input type="username" class="form-control bg-transparent text-white rounded-pill" id="username" placeholder="Username" required>
       </div>
       <div class="mb-3">
         <input type="password" class="form-control bg-transparent text-white rounded-pill" id="password" placeholder="Password" required>
       </div>
-      <button type="submit" class="btn btn-login w-100 rounded-pill mb-3">LOGIN</button>
-
+      
+      <a href="todo.html" class="btn btn-login w-100 rounded-pill mb-3">LOGIN</a>
       <div class="d-flex justify-content-between mb-3">
         <a href="#">Forgot Password?</a>
         <a href="log.html">Sign Up</a>
@@ -96,11 +96,11 @@
     document.getElementById('loginForm').addEventListener('submit', function(event) {
       event.preventDefault();
       
-      const email = document.getElementById('email').value.trim();
+      const email = document.getElementById('username').value.trim();
       const password = document.getElementById('password').value.trim();
       
       if (email && password) {
-        alert(`Logged in with:\nEmail: ${email}\nPassword: ${password}`);
+        alert(`Logged in with:\nUsername: ${admin}\nPassword: ${123}`);
       } else {
         alert('Please fill in all fields.');
       }

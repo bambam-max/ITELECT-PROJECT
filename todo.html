@@ -6,14 +6,13 @@
   <title>ToDo List</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" />
-
   <style>
-    body{
-        background: url(3.jpg);
+    body {
+      background: url(3.jpg);
     }
     .todo-card {
       width: 100%;
-      max-width: 400px;
+      max-width: 500px;
       background-color: rgba(140, 158, 197, 0.579);
     }
     .todo-input {
@@ -29,8 +28,9 @@
     }
   </style>
 </head>
-<body class="bg-info d-flex flex-column justify-content-center align-items-center vh-100">
+<body class="d-flex flex-column justify-content-center align-items-center py-5 gap-4">
 
+  <!-- ToDo List -->
   <div class="card p-4 todo-card">
     <h4 class="text-center">ToDo List <span class="ms-2">📝✏️</span></h4>
     <div class="input-group my-3">
@@ -39,15 +39,35 @@
     </div>
     <div id="message" class="text-success text-center small mb-2"></div>
     <ul id="taskList" class="list-group"></ul>
+    <div class="mt-3 d-flex justify-content-between">
+      <a href="in.html" class="btn btn-outline-light">
+        <i class="bi bi-box-arrow-left me-1"></i> Back to Login
+      </a>
+      <button class="btn btn-dark" data-bs-toggle="modal" data-bs-target="#historyModal" onclick="renderHistory()">
+        <i class="bi bi-clock-history me-1"></i> View Task History
+      </button>
+    </div>
   </div>
 
-
-  <div class="mt-3">
-    <a href="modal.html" class="btn btn-dark">
-      <i class="bi bi-clock-history me-1"></i> View Task History
-    </a>
+  <!-- Task History Modal -->
+  <div class="modal fade" id="historyModal" tabindex="-1" aria-labelledby="historyModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content bg-light">
+        <div class="modal-header">
+          <h5 class="modal-title" id="historyModalLabel">✅ Completed Task History</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body" id="historyContent">
+          <!-- Task history will be populated here -->
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
   </div>
 
+  <!-- Scripts -->
   <script>
     let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
 
@@ -56,10 +76,74 @@
     }
 
     function renderTasks() {
-      const list = document.getElementById('taskList');}
+      const list = document.getElementById('taskList');
       list.innerHTML = '';
-      tasks.forEach((task, index)) => {
+      tasks.forEach((task, index) => {
         const li = document.createElement('li');
-  <script src ="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>}
+        li.className = 'list-group-item d-flex justify-content-between align-items-center todo-item' + (task.done ? ' done' : '');
+        li.innerHTML = `
+          <span>${task.text}</span>
+          <div>
+            <button class="btn btn-sm btn-${task.done ? 'warning' : 'success'} me-2" onclick="toggleDone(${index})">
+              ${task.done ? 'Undo' : 'Done'}
+            </button>
+            <button class="btn btn-sm btn-danger" onclick="deleteTask(${index})">Delete</button>
+          </div>
+        `;
+        list.appendChild(li);
+      });
+    }
+
+    function addTask() {
+      const input = document.getElementById('taskInput');
+      const text = input.value.trim();
+      if (text) {
+        tasks.push({ text: text, done: false, completedAt: null });
+        input.value = '';
+        saveTasks();
+        renderTasks();
+      }
+    }
+
+    function toggleDone(index) {
+      tasks[index].done = !tasks[index].done;
+      tasks[index].completedAt = tasks[index].done ? new Date().toISOString() : null;
+      saveTasks();
+      renderTasks();
+    }
+
+    function deleteTask(index) {
+      tasks.splice(index, 1);
+      saveTasks();
+      renderTasks();
+    }
+
+    function renderHistory() {
+      const historyContainer = document.getElementById('historyContent');
+      const completedTasks = tasks.filter(task => task.done);
+      historyContainer.innerHTML = '';
+
+      if (completedTasks.length === 0) {
+        historyContainer.innerHTML = '<p class="text-muted text-center">No completed tasks yet.</p>';
+      } else {
+        const ul = document.createElement('ul');
+        ul.className = 'list-group';
+        completedTasks.forEach(task => {
+          const li = document.createElement('li');
+          li.className = 'list-group-item';
+          li.innerHTML = `
+            <strong>${task.text}</strong><br/>
+            <small class="text-muted">Completed at: ${new Date(task.completedAt).toLocaleString()}</small>
+          `;
+          ul.appendChild(li);
+        });
+        historyContainer.appendChild(ul);
+      }
+    }
+
+    renderTasks();
+  </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
